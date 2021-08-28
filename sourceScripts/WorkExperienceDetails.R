@@ -64,13 +64,18 @@ createWorkExperienceDetail <- function(rowNum, dataframe, allRenderedBullets){
 
 renderWorkExperienceDetailsForResume <- function(workExerienceDetailObject){
   
+  endDateDetail <- workExerienceDetailObject@endDate
+  if(is.na(endDateDetail)){
+    endDateDetail <- "Present"
+  }
+  
   outString <- 
     paste0("### ", workExerienceDetailObject@positionTitle,
             "\n \n", 
             workExerienceDetailObject@companyName_full,
             "\n \n", 
             workExerienceDetailObject@city, ", ", workExerienceDetailObject@state, "\n \n",
-            workExerienceDetailObject@endDate, " - ", workExerienceDetailObject@startDate,
+           endDateDetail, " - ", workExerienceDetailObject@startDate,
             "\n \n", workExerienceDetailObject@experienceBullets)
 
   return(outString)
