@@ -4,8 +4,11 @@ author:  Bryce Turner
 date: "`r Sys.Date()`"
 output:
   pagedown::html_resume:
+    css: 
+      - override.css
+      - resume
     # set it to true for a self-contained HTML page but it'll take longer to render
-    self_contained: false
+    self_contained: FALSE
 # uncomment this line to produce HTML and PDF in RStudio:
 #knit: pagedown::chrome_print
 ---
@@ -18,6 +21,7 @@ library(readxl)
 library(tidyverse)
 
 source("sourceScripts/EducationDetails.R")
+source("sourceScripts/WorkExperienceDetails.R")
 
 # Helpful Tools
 # https://towardsdatascience.com/create-your-resume-with-pagedown-package-in-r-123ca6310d52
@@ -26,25 +30,15 @@ source("sourceScripts/EducationDetails.R")
 ```
 
 
-```{r prepEducationResumeDetails, echo = FALSE}
-educationDetailsDataframe <- read_excel(path = "resume_details.xlsx",
-                               sheet = "EducationDetails") %>% 
-  arrange(!is.na(EndDate),-EndDate)
-
-
-allEducationDetails <- mapply(FUN = createEducationDetailFromExcel,
-                              rowNum = seq(1, nrow(educationDetailsDataframe)),
-                              MoreArgs = list(dataframe = educationDetailsDataframe),
-                              SIMPLIFY = TRUE)
-
-allEducationDetails <- lapply(X = allEducationDetails,
-                              FUN = renderEducationDetailsForResume) %>% 
-  unlist
-
-```
 
 Aside
 ================================================================================
+
+```{r, echo = FALSE}
+personalDetails <- read_excel(path = "00_resumeDetails.xlsx",
+                              sheet = "PersonalDetails") %>% 
+  pivot_wider(names_from = LineItem, values_from = Value)
+```
 
 
 <!-- ![Lijia Yu](https://avatars1.githubusercontent.com/u/895125?s=400&v=4){width=80%} --->
@@ -53,20 +47,24 @@ Aside
 Contact Info {#contact}
 --------------------------------------------------------------------------------
 
-- <i class="fa fa-envelope"></i> `r "current_email" `
-- <i class="fa fa-github"></i> [github.com/yulijia](https://github.com/yulijia)
-- <i class="fa fa-phone"></i> `r "current_phone"`
-
+- <i class="fa fa-phone"></i> `r personalDetails$Phone`
+- <i class="fa fa-envelope"></i> `r personalDetails$Email`
+- <i class="fa fa-linkedin"></i> `r personalDetails$LinkedInURL`
+- <i class="fa fa-github"></i> `r personalDetails$GitHubURL`
 
 
 Skills {#skills}
 --------------------------------------------------------------------------------
 
-- Experienced in statistical analysis, statistical learning models, and optimization methods.
-
-- Full experience with next generation sequencing data analysis.
-
-- Highly skilled in R, Bash, Perl, Python, LaTeX
+```{r, results='asis', echo=FALSE}
+cat(paste("-", personalDetails$CoreCompetency1))
+cat("\n \n")
+cat(paste("-", personalDetails$CoreCompetency2))
+cat("\n \n")
+cat(paste("-", personalDetails$CoreCompetency3))
+cat("\n \n")
+cat(paste("-", personalDetails$Languages))
+```
 
 
 Disclaimer {#disclaimer}
@@ -84,122 +82,70 @@ Main
 Bryce Turner {#title}
 --------------------------------------------------------------------------------
 
+
 Education {data-icon=none data-concise=true}
 --------------------------------------------------------------------------------
+```{r prepEducationResumeDetails, echo = FALSE}
+educationDetailsDataframe <- read_excel(path = "00_resumeDetails.xlsx",
+                               sheet = "EducationDetails") %>% 
+  arrange(!is.na(EndDate),-EndDate)
+
+
+allEducationDetails <- 
+  mapply(FUN = createEducationDetailFromExcel,
+         rowNum = seq(1, nrow(educationDetailsDataframe)),
+         MoreArgs = list(dataframe = educationDetailsDataframe),
+         SIMPLIFY = TRUE) %>% 
+  lapply(X = .,
+         FUN = renderEducationDetailsForResume) %>% 
+  unlist
+
+```
+
+
 ```{r, echo = FALSE, results='asis'}
 cat(allEducationDetails, sep = "\n\n")
 ```
 
-
-Research Experience {data-icon=none}
---------------------------------------------------------------------------------
-
-### Graduate Research Assistant
-
-Beijing Institute of Genomics, Chinese Academy of Sciences
-
-Beijing, China
-
-2011 - 2014
-
-- Performed computational biology research towards understanding regulation of alternative splicing in human and mouse transcriptome.
-- Found EGFR pathway related mutations, aimed to understand the impacts of cancer mutations on EGFR signaling pathway.
-
-### Bioinformatican
-
-My Health Gene Technology Co., Ltd.
-
-Beijing, China
-
-2015 - 2016
-
-- Investigated how cancer cells spread to other parts of the body at the single cell level.
-
-### Visiting Scientist
-
-University of Alabama at Birmingham
-
-AL, USA
-
-2016 - 2018
-
-- Investigated the role of mitochondria in development of cancer.
-- Investigated the evolution of genome architecture and its role in important evolutionary events.
-- Detected thrombotic thrombocytopenic purpura related mutations in mutiple patients' blood genome.
-  
-
 Professional Experience {data-icon=suitcase}
 --------------------------------------------------------------------------------
+```{r prepWorkExperience, echo = FALSE}
+workExperienceBullets <- read_excel("~/personal/resume/00_resumeDetails.xlsx",
+                          sheet = "WorkExperienceBullets" )
 
-### Data Scientist, intern
+allExperienceIds <- unique(workExperienceBullets$ExperienceId)
+allRenderedBullets <- mapply(FUN = createBulletsFromExcel,
+                             experienceId = allExperienceIds,
+                             MoreArgs = 
+                               list(fullBulletsDataframe = workExperienceBullets))
+names(allRenderedBullets) <- allExperienceIds
 
-SupStat Inc.
+experienceIdsToDisplay <- seq(3,5)
 
-Beijing, China
+workExperienceDetails <-
+  read_excel(path = "00_resumeDetails.xlsx",
+             sheet = "WorkExperienceDetails") %>% 
+  arrange(!is.na(EndDateYear),-EndDateYear) %>% 
+  filter(ExperienceId %in% experienceIdsToDisplay)
 
-2014
+allRenderedWorkExperiences <- 
+  mapply(FUN = createWorkExperienceDetail,
+         rowNum = 1:nrow(workExperienceDetails),
+         MoreArgs = 
+           list(dataframe = workExperienceDetails,
+                allRenderedBullets = allRenderedBullets)) %>% 
+  lapply(X = .,
+         FUN = renderWorkExperienceDetailsForResume) %>% 
+  unlist
+```
 
-::: concise
-- Taught R language to beginners. 
-- Wrote Shiny app demos.
-- Converted statistical tutorials from SPSS to R language.
-:::
+```{r, echo = FALSE, results='asis'}
+cat(allRenderedWorkExperiences, sep = "\n\n")
+```
 
-### Bioinformatician
-
-My Health Gene Technology Co., Ltd.
-
-Beijing, China
-
-2015 - 2016
-
-::: concise
-- Analyzed whole-exome sequencing data. 
-- Wrote analysis pipelines of ChIP-seq, single cell DNA-seq and single cell RNA-seq.
-- Studied tumor metastasis and wrote research reports. 
-- Also did case studies to identify the genetic defect causing rare disease.
-:::
-
-
-Teaching Experience {data-icon=chalkboard-teacher}
+Research Projects {data-icon=none}
 --------------------------------------------------------------------------------
 
-### Introduction to R Language for Beginners.
-
-Instructor of R and Data Mining Training Courses at SupStat Inc.
-
-Beijing, China
-
-2014
-
-### Computational Biology and Bioinformatics.
-
-Teaching assistant of GBS CB2-201 courses at UAB
-
-AL, USA
-
-2016 - 2017
 
 
-Selected Publications and Posters {data-icon=file}
---------------------------------------------------------------------------------
 
-### Genetic and epigenetic signals are found predictive to the distribution of intra-individual divergence of alternative splicing.
-
-Poster for 2013 International Conference of Genomics
-
-Qingdao, China
-
-2014
-
-**Yu L**, Chen B, Zhang Z.
-
-### ESCRT-0 complex modulates Rbf mutant cell survival by regulating Rhomboid endosomal trafficking and EGFR signaling.
-
-J Cell Sci. 2016 May 15;129(10):2075-84.
-
-N/A
-
-2016 
-
-Sheng Z, **Yu L**, Zhang T, Pei X, Li X, Zhang Z and Du W. 

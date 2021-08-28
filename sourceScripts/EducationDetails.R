@@ -40,24 +40,24 @@ createEducationDetailFromExcel <- function(dataframe, rowNum){
 
 
 
-renderEducationDetailsForResume <- function(object){
+renderEducationDetailsForResume <- function(educationDetailsObject){
   
   minorDetail <- 
-   ifelse(is.na(object@minor), 
+   ifelse(is.na(educationDetailsObject@minor), 
           "", 
-          paste(",", object@minor))
+          paste(",", educationDetailsObject@minor))
   
   endDateDetail <- 
-    ifelse(is.na(object@graduationDate), 
+    ifelse(is.na(educationDetailsObject@graduationDate), 
            "In Progress", 
-           object@graduationDate)
+           educationDetailsObject@graduationDate)
   
   
-  outString <- paste0("### ", object@university,
+  outString <- paste0("### ", educationDetailsObject@degree, minorDetail,
                       "\n \n", 
-                      object@degree, minorDetail,
+                      educationDetailsObject@university,
                       "\n \n", 
-                      object@location, "\n \n",
+                      educationDetailsObject@location, "\n \n",
                       endDateDetail)
   
   return(outString)
