@@ -70,7 +70,7 @@ renderWorkExperienceDetailsForResume <- function(workExerienceDetailObject){
             workExerienceDetailObject@companyName_full,
             "\n \n", 
             workExerienceDetailObject@city, ", ", workExerienceDetailObject@state, "\n \n",
-            workExerienceDetailObject@startDate, " - ", workExerienceDetailObject@endDate,
+            workExerienceDetailObject@endDate, " - ", workExerienceDetailObject@startDate,
             "\n \n", workExerienceDetailObject@experienceBullets)
 
   return(outString)
