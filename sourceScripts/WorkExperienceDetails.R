@@ -11,16 +11,16 @@ setClass("workExperienceDetails",
                       experienceBullets = "character"))
 
 
-renderBulletsForResume <- function(bulletsList){
+renderBulletsForResume <- function(bulletsVector){
   
-  bullets <- paste(bulletsList, collapse = "\n- ")
+  bullets <- paste(bulletsVector, collapse = "\n- ")
   
   finalForRender <- paste0(":::consise\n- ", bullets, "\n:::")
   
   return(finalForRender)
 }
 
-createBulletsFromExcel <- function(experienceId, fullBulletsDataframe){
+createWorkBulletsFromExcel <- function(experienceId, fullBulletsDataframe){
   
   usingData <- filter(fullBulletsDataframe, 
                       fullBulletsDataframe$ExperienceId == experienceId)

@@ -19,10 +19,6 @@ setwd("~/personal/resume/")
 
 library(readxl)
 library(tidyverse)
-
-source("sourceScripts/EducationDetails.R")
-source("sourceScripts/WorkExperienceDetails.R")
-
 # Helpful Tools
 # https://towardsdatascience.com/create-your-resume-with-pagedown-package-in-r-123ca6310d52
 
@@ -57,13 +53,15 @@ Skills {#skills}
 --------------------------------------------------------------------------------
 
 ```{r, results='asis', echo=FALSE}
+
+cat(paste("-", personalDetails$Languages))
+cat("\n \n")
 cat(paste("-", personalDetails$CoreCompetency1))
 cat("\n \n")
 cat(paste("-", personalDetails$CoreCompetency2))
 cat("\n \n")
 cat(paste("-", personalDetails$CoreCompetency3))
-cat("\n \n")
-cat(paste("-", personalDetails$Languages))
+
 ```
 
 
@@ -86,6 +84,8 @@ Bryce Turner {#title}
 Education {data-icon=none data-concise=true}
 --------------------------------------------------------------------------------
 ```{r prepEducationResumeDetails, echo = FALSE}
+source("sourceScripts/EducationDetails.R")
+
 educationDetailsDataframe <- read_excel(path = "00_resumeDetails.xlsx",
                                sheet = "EducationDetails") %>% 
   arrange(!is.na(EndDate),-EndDate)
@@ -110,14 +110,17 @@ cat(allEducationDetails, sep = "\n\n")
 Professional Experience {data-icon=suitcase}
 --------------------------------------------------------------------------------
 ```{r prepWorkExperience, echo = FALSE}
+source("sourceScripts/WorkExperienceDetails.R")
+
 workExperienceBullets <- read_excel("~/personal/resume/00_resumeDetails.xlsx",
                           sheet = "WorkExperienceBullets" )
 
 allExperienceIds <- unique(workExperienceBullets$ExperienceId)
-allRenderedBullets <- mapply(FUN = createBulletsFromExcel,
+allRenderedBullets <- mapply(FUN = createWorkBulletsFromExcel,
                              experienceId = allExperienceIds,
                              MoreArgs = 
                                list(fullBulletsDataframe = workExperienceBullets))
+
 names(allRenderedBullets) <- allExperienceIds
 
 experienceIdsToDisplay <- seq(3,5)
@@ -145,7 +148,38 @@ cat(allRenderedWorkExperiences, sep = "\n\n")
 
 Research Projects {data-icon=none}
 --------------------------------------------------------------------------------
+```{r prepProjectDetails, echo = FALSE}
+source("sourceScripts/projectDetails.R")
+projectBullets <- read_excel("00_resumeDetails.xlsx",
+                             sheet = "ProjectsBullets")
+allProjectIds <- unique(projectBullets$ProjectId)
+
+allRenderedBullets <- mapply(FUN = createProjectBulletsFromExcel,
+                             projectId = allProjectIds,
+                             MoreArgs = 
+                               list(fullBulletsDataframe = projectBullets))
+
+names(allRenderedBullets) <- allProjectIds
 
 
+projectDetails <- read_excel("00_resumeDetails.xlsx",
+                             sheet = "ProjectsDetails") %>% 
+   arrange(!is.na(ProjectYear),-ProjectYear) 
+
+
+allRenderedProjectsExperiences <- 
+  mapply(FUN = createProjectExperienceDetail,
+         rowNum = 1:nrow(projectDetails),
+         MoreArgs = 
+           list(dataframe = projectDetails,
+                allRenderedBullets = allRenderedBullets)) %>% 
+  lapply(X = .,
+         FUN = renderProjectExperienceDetailsForResume) %>% 
+  unlist
+```
+
+```{r, echo = FALSE, results='asis'}
+cat(allRenderedProjectsExperiences, sep = "\n\n")
+```
 
 
