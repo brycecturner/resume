@@ -52,12 +52,20 @@ renderEducationDetailsForResume <- function(educationDetailsObject){
            "In Progress", 
            educationDetailsObject@graduationDate)
   
+  if(is.na(educationDetailsObject@location)){
+    location <- "N/A"
+  } else{
+    location <- 
+      paste0("<i class=\"fas fa-map-marker\"></i> ",
+             educationDetailsObject@location)
+  }
+  
   
   outString <- paste0("### ", educationDetailsObject@degree, minorDetail,
                       "\n \n", 
                       educationDetailsObject@university,
                       "\n \n", 
-                      educationDetailsObject@location, "\n \n",
+                      location, "\n \n",
                       endDateDetail)
   
   return(outString)

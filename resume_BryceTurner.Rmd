@@ -5,12 +5,13 @@ date: "`r Sys.Date()`"
 output:
   pagedown::html_resume:
     css: 
-      - override.css
       - resume
+      - override.css
     # set it to true for a self-contained HTML page but it'll take longer to render
     self_contained: FALSE
-# uncomment this line to produce HTML and PDF in RStudio:
-#knit: pagedown::chrome_print
+
+#uncomment the following line to get pdf
+knit: pagedown::chrome_print
 ---
 
 
@@ -19,13 +20,13 @@ setwd("~/personal/resume/")
 
 library(readxl)
 library(tidyverse)
+
 # Helpful Tools
 # https://towardsdatascience.com/create-your-resume-with-pagedown-package-in-r-123ca6310d52
 
 # https://livefreeordichotomize.com/2019/09/04/building_a_data_driven_cv_with_r/
+
 ```
-
-
 
 Aside
 ================================================================================
@@ -35,9 +36,6 @@ personalDetails <- read_excel(path = "00_resumeDetails.xlsx",
                               sheet = "PersonalDetails") %>% 
   pivot_wider(names_from = LineItem, values_from = Value)
 ```
-
-
-<!-- ![Lijia Yu](https://avatars1.githubusercontent.com/u/895125?s=400&v=4){width=80%} --->
 
 
 Contact Info {#contact}
@@ -68,10 +66,10 @@ cat(paste("-", personalDetails$CoreCompetency3))
 Disclaimer {#disclaimer}
 --------------------------------------------------------------------------------
 
-This resume was made with the R package [**pagedown**](https://github.com/rstudio/pagedown).
+This resume was made with the R package [**pagedown**](https://github.com/rstudio/pagedown). 
+The files used to render this page are available on my github.
 
 Last updated on `r Sys.Date()`.
-
 
 
 Main
@@ -79,33 +77,6 @@ Main
 
 Bryce Turner {#title}
 --------------------------------------------------------------------------------
-
-
-Education {data-icon=none data-concise=true}
---------------------------------------------------------------------------------
-```{r prepEducationResumeDetails, echo = FALSE}
-source("sourceScripts/EducationDetails.R")
-
-educationDetailsDataframe <- read_excel(path = "00_resumeDetails.xlsx",
-                               sheet = "EducationDetails") %>% 
-  arrange(!is.na(EndDate),-EndDate)
-
-
-allEducationDetails <- 
-  mapply(FUN = createEducationDetailFromExcel,
-         rowNum = seq(1, nrow(educationDetailsDataframe)),
-         MoreArgs = list(dataframe = educationDetailsDataframe),
-         SIMPLIFY = TRUE) %>% 
-  lapply(X = .,
-         FUN = renderEducationDetailsForResume) %>% 
-  unlist
-
-```
-
-
-```{r, echo = FALSE, results='asis'}
-cat(allEducationDetails, sep = "\n\n")
-```
 
 Professional Experience {data-icon=suitcase}
 --------------------------------------------------------------------------------
@@ -146,7 +117,7 @@ allRenderedWorkExperiences <-
 cat(allRenderedWorkExperiences, sep = "\n\n")
 ```
 
-Research Projects {data-icon=none}
+Projects {data-icon=laptop}
 --------------------------------------------------------------------------------
 ```{r prepProjectDetails, echo = FALSE}
 source("sourceScripts/projectDetails.R")
@@ -161,10 +132,12 @@ allRenderedBullets <- mapply(FUN = createProjectBulletsFromExcel,
 
 names(allRenderedBullets) <- allProjectIds
 
+projectIdsToDisplay <- c("2", "3", "4", "5")
 
 projectDetails <- read_excel("00_resumeDetails.xlsx",
                              sheet = "ProjectsDetails") %>% 
-   arrange(!is.na(ProjectYear),-ProjectYear) 
+   arrange(!is.na(ProjectYear),-ProjectYear) %>% 
+  filter(ProjectId %in% projectIdsToDisplay)
 
 
 allRenderedProjectsExperiences <- 
@@ -182,4 +155,28 @@ allRenderedProjectsExperiences <-
 cat(allRenderedProjectsExperiences, sep = "\n\n")
 ```
 
+Education {data-icon=graduation-cap data-concise=true}
+--------------------------------------------------------------------------------
+```{r prepEducationResumeDetails, echo = FALSE}
+source("sourceScripts/EducationDetails.R")
+
+educationDetailsDataframe <- read_excel(path = "00_resumeDetails.xlsx",
+                               sheet = "EducationDetails") %>% 
+  arrange(!is.na(EndDate),-EndDate)
+
+
+allEducationDetails <- 
+  mapply(FUN = createEducationDetailFromExcel,
+         rowNum = seq(1, nrow(educationDetailsDataframe)),
+         MoreArgs = list(dataframe = educationDetailsDataframe),
+         SIMPLIFY = TRUE) %>% 
+  lapply(X = .,
+         FUN = renderEducationDetailsForResume) %>% 
+  unlist
+
+```
+
+```{r, echo = FALSE, results='asis'}
+cat(allEducationDetails, sep = "\n\n")
+```
 

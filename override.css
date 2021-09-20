@@ -1,7 +1,21 @@
-
-
-:root{
-  --sidebar-width: 12.5rem; /* side bar width */
+* {
+  /* Override Page Margins*/
+  --pagedjs-margin-right: 0.3in;
+  --pagedjs-margin-left: 0.3in;
+  --pagedjs-margin-bottom: 0.3in;
 }
 
+:root{
+  --sidebar-width: 12.5rem; /* side bar width */  
+  --main-width: 5.8in; 
+  --row-blocks-padding-top: 5pt;
+}
 
+.fa-map-marker-alt:before{
+  /* turn off location icon so I can use this location for more than just location */
+  content: '';
+}
+
+.details{
+  padding-top: 1pt;
+}

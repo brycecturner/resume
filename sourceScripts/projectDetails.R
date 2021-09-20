@@ -3,7 +3,9 @@ setClass("projectDetails",
                       projectName_full = "character",
                       projectName_short = "character", 
                       companyName_short = "character",
+                      companyName_full = "character",
                       projectYear = "numeric",
+                      projectLink  ="character",
                       projectBullets = "character"))
 
 
@@ -39,8 +41,10 @@ createProjectExperienceDetail <- function(rowNum, dataframe, allRenderedBullets)
         projectId = usingRow$ProjectId,
         projectName_full = usingRow$ProjectName_full,
         projectName_short = usingRow$ProjectName_short,
+        companyName_full = usingRow$ProjectCompanyName_full,
         companyName_short = usingRow$ProjectCompanyName_short,
         projectYear = usingRow$ProjectYear,
+        projectLink = usingRow$ProjectLink,
         projectBullets = specificBullet)
   
   return(newInstance)
@@ -54,12 +58,23 @@ renderProjectExperienceDetailsForResume <- function(projectDetailObject){
     projectYearDetail <- "Ongoing"
   }
   
+
+  if(is.na(projectDetailObject@projectLink)){
+    projectLink <- "N/A"
+  } else{
+    projectLink <- 
+      paste0("<i class=\"fas fa-globe\"></i> ",
+             "[Published Project Link](",
+             projectDetailObject@projectLink,
+             ")")
+  }
+  
   outString <- 
     paste0("### ", projectDetailObject@projectName_full,
            "\n \n", 
-           projectDetailObject@companyName_short,
+           projectDetailObject@companyName_full,
            "\n \n", 
-           "N/A",
+           projectLink,
            "\n \n",  #Removing geographic location
            projectYearDetail,"\n \n", 
            projectDetailObject@projectBullets)

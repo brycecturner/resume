@@ -41,6 +41,8 @@ createWorkExperienceDetail <- function(rowNum, dataframe, allRenderedBullets){
                   usingRow$EndDateYear, sep = ", ")
   
   
+  
+  
   specificExperienceId <- as.character(usingRow$ExperienceId)
   specificBullet <- unname(allRenderedBullets[specificExperienceId])
   
@@ -69,12 +71,21 @@ renderWorkExperienceDetailsForResume <- function(workExerienceDetailObject){
     endDateDetail <- "Present"
   }
   
+  if(is.na(workExerienceDetailObject@state)){
+    location <- "N/A"
+  } else{
+    location <- 
+      paste0("<i class=\"fas fa-map-marker\"></i> ",
+             workExerienceDetailObject@city, ", ", workExerienceDetailObject@state)
+    
+  }
+  
   outString <- 
     paste0("### ", workExerienceDetailObject@positionTitle,
             "\n \n", 
             workExerienceDetailObject@companyName_full,
             "\n \n", 
-            workExerienceDetailObject@city, ", ", workExerienceDetailObject@state, "\n \n",
+           location, "\n \n",
            endDateDetail, " - ", workExerienceDetailObject@startDate,
             "\n \n", workExerienceDetailObject@experienceBullets)
 
