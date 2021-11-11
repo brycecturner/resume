@@ -162,7 +162,8 @@ source("sourceScripts/EducationDetails.R")
 
 educationDetailsDataframe <- read_excel(path = "00_resumeDetails.xlsx",
                                sheet = "EducationDetails") %>% 
-  arrange(!is.na(EndDate),-EndDate)
+  arrange(!is.na(EndDate),-EndDate) %>% 
+  filter(EducationId == 1)
 
 
 allEducationDetails <- 
